@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoSwap 🌱 | Plataforma Comunitaria de Intercambio Ecológico</title>
+  <meta name="description" content="EcoSwap es la plataforma sustentable donde puedes darle una segunda vida a tus cosas. Intercambia libros, artículos del hogar, tecnología y más acumulando EcoPuntos.">
+  
+  <!-- PWA Meta Tags & Web App Manifest -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#10b981" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#09130e" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="EcoSwap">
+  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <!-- Canvas para partículas de celebración al canjear -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Barra de Navegación Superior -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-wrapper" id="btn-brand-home" title="EcoSwap - Inicio">
+        <div class="brand-icon">🌱</div>
+        <div>
+          <h1 class="brand-title">EcoSwap</h1>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Racha Diaria de Conexión -->
+        <button class="streak-badge" id="btn-open-streak" title="Tu Racha Diaria de Conexión (+10 EcoPts)">
+          <span class="streak-icon" id="header-streak-icon">🔥</span>
+          <span class="streak-count-text" id="header-streak-val">0 Días</span>
+          <span class="streak-ping" id="header-streak-ping"></span>
+        </button>
+
+        <!-- Billetera de Puntos Interactiva -->
+        <button class="points-badge" id="btn-open-wallet" title="Ver detalles de tus puntos y racha diaria">
+          <span class="points-icon">⭐</span>
+          <span id="header-points-val">250 Pts</span>
+        </button>
+
+        <!-- Botón Publicar Objeto -->
+        <button class="btn-primary" id="btn-open-publish">
+          <span>➕</span>
+          <span>Publicar Objeto</span>
+        </button>
+
+        <!-- Botón Modo Oscuro / Claro -->
+        <button class="btn-icon" id="btn-toggle-theme" title="Alternar tema visual" aria-label="Cambiar tema">
+          🌙
+        </button>
+
+        <!-- Botón Instalar PWA (visible si la app es instalable) -->
+        <button class="pwa-install-badge" id="btn-header-install" title="Instalar EcoSwap en tu dispositivo" style="display: none;">
+          <span class="pwa-icon">📲</span>
+          <span class="pwa-btn-text">Instalar App</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenedor Principal de la Aplicación -->
+  <div class="app-container">
+
+    <!-- Banner de Estado de Conexión Offline -->
+    <div id="offline-status-banner" class="offline-banner" style="display: none;">
+      <div class="offline-banner-inner">
+        <span class="offline-pulse"></span>
+        <span>📡 <strong>Modo Sin Conexión activo:</strong> Puedes seguir navegando el catálogo, tus puntos y tu racha guardada.</span>
+      </div>
+    </div>
+
+    <!-- Banner Hero de Bienvenida -->
+    <section class="hero-banner">
+      <div class="hero-content">
+        <div class="hero-tag">
+          <span>🌿</span> Economía Circular en tu Barrio
+        </div>
+        <h2 class="hero-title">Dale una segunda vida a tus cosas</h2>
+        <p class="hero-subtitle">
+          Intercambia, dona y gana beneficios locales. Cada intercambio reduce la huella de carbono y fortalece tu comunidad.
+        </p>
+
+        <div class="hero-stats-row">
+          <div class="hero-stat">
+            <span class="stat-num" id="stat-co2-saved">142.5 kg</span>
+            <span class="stat-label">CO₂ Evitado</span>
+          </div>
+          <div class="hero-stat">
+            <span class="stat-num" id="stat-items-swapped">89</span>
+            <span class="stat-label">Objetos Circulados</span>
+          </div>
+          <div class="hero-stat">
+            <span class="stat-num">⭐ 1 EcoPto = 1 Acción</span>
+            <span class="stat-label">Economía Justa</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Widget Interactivo de Racha Diaria para Impulsar Retención y Consumo Diario -->
+    <section class="streak-widget-card" id="streak-widget-card">
+      <div class="streak-widget-header">
+        <div class="streak-widget-title-group">
+          <div class="streak-fire-avatar" id="widget-fire-avatar">🔥</div>
+          <div>
+            <div class="streak-badge-pill" id="widget-streak-rank">Semilla Constante 🌱</div>
+            <h3 class="streak-widget-title" id="widget-streak-title">Racha Diaria de Conexión</h3>
+            <p class="streak-widget-desc">
+              Conéctate a diario y recibe <strong>10 EcoPts fijos</strong> para canjear productos en tu comunidad sin gastar dinero.
+            </p>
+          </div>
+        </div>
+        <div class="streak-widget-action">
+          <button class="btn-primary btn-claim-streak" id="btn-widget-claim">
+            <span>🔥</span>
+            <span id="btn-widget-claim-text">Reclamar Login (+10 EcoPts)</span>
+          </button>
+          <div class="streak-countdown-text" id="widget-countdown-box" style="display: none;">
+            Próximo bono en: <strong id="widget-countdown-timer">00:00:00</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pista Visual de los 7 Días de Racha (10 EcoPts diarios) -->
+      <div class="streak-days-track" id="widget-days-track">
+        <!-- Generado dinámicamente -->
+      </div>
+
+      <!-- Franja de Impulso al Consumo Diario -->
+      <div class="streak-consumer-incentive">
+        <div class="incentive-info">
+          <span class="incentive-icon">🛍️</span>
+          <span id="streak-incentive-msg">
+            ¡Cada día cuenta! Con tu racha de hoy acumulas EcoPts para canjear <strong>Plantas (40 Pts)</strong> o <strong>Libros (50 Pts)</strong>.
+          </span>
+        </div>
+        <button class="chip-btn" id="btn-explore-swaps" style="font-weight: 700; white-space: nowrap;">
+          Ver Objetos Disponibles ➔
+        </button>
+      </div>
+    </section>
+
+    <!-- Pestañas de Navegación -->
+    <nav class="nav-tabs" aria-label="Secciones de EcoSwap">
+      <button class="tab-btn active" id="tab-feed" data-tab="feed">
+        <span>🔍</span> Disponibles en tu zona
+      </button>
+      <button class="tab-btn" id="tab-my-swaps" data-tab="my-swaps">
+        <span>📦</span> Mis Canjes & Donaciones
+      </button>
+      <button class="tab-btn" id="tab-impact" data-tab="impact">
+        <span>📊</span> Impacto Ecológico
+      </button>
+      <button class="tab-btn" id="tab-missions" data-tab="missions">
+        <span>⚡</span> Misiones Verdes
+      </button>
+    </nav>
+
+    <!-- Vista 1: Feed de Artículos Disponibles -->
+    <main id="view-feed" class="tab-view active">
+      <!-- Barra de Filtros y Búsqueda -->
+      <section class="controls-bar">
+        <div class="search-box">
+          <span class="search-icon">🔎</span>
+          <input 
+            type="search" 
+            id="search-input" 
+            class="search-input" 
+            placeholder="Buscar por libro, cafetera, plantas, tecnología..." 
+            aria-label="Buscar artículos"
+          />
+        </div>
+
+        <div class="category-chips" id="category-chips">
+          <button class="chip-btn active" data-category="all">Todos</button>
+          <button class="chip-btn" data-category="Libros">📚 Libros</button>
+          <button class="chip-btn" data-category="Electrodomésticos">☕ Electrodomésticos</button>
+          <button class="chip-btn" data-category="Tecnología">🎧 Tecnología</button>
+          <button class="chip-btn" data-category="Plantas & Jardín">🪴 Plantas & Jardín</button>
+          <button class="chip-btn" data-category="Moda Sostenible">🧥 Moda Sostenible</button>
+          <button class="chip-btn" data-category="Hogar & Deco">🏠 Hogar & Deco</button>
+        </div>
+      </section>
+
+      <!-- Encabezado de Sección y Contador -->
+      <div class="feed-header">
+        <h3 class="section-title">
+          <span>📍</span> Cerca de ti
+        </h3>
+        <span class="items-count-badge" id="items-counter">Mostrando 8 objetos</span>
+      </div>
+
+      <!-- Grid de Productos -->
+      <div class="items-grid" id="items-grid">
+        <!-- Renderizado dinámico vía app.js -->
+      </div>
+    </main>
+
+    <!-- Vista 2: Mis Canjes & Donaciones -->
+    <section id="view-my-swaps" class="tab-view" style="display: none;">
+      <div class="feed-header">
+        <h3 class="section-title">📦 Artículos Reclamados & Donados</h3>
+      </div>
+      <div class="items-grid" id="claimed-grid">
+        <!-- Contenido generado dinámicamente -->
+      </div>
+    </section>
+
+    <!-- Vista 3: Impacto Ecológico -->
+    <section id="view-impact" class="tab-view" style="display: none;">
+      <div class="feed-header">
+        <h3 class="section-title">🌍 Tu Huella Positiva en la Comunidad</h3>
+      </div>
+      
+      <div class="impact-grid">
+        <div class="impact-card">
+          <div class="impact-icon-circle">🌱</div>
+          <div class="impact-info">
+            <h4>Nivel Ecológico</h4>
+            <div class="impact-number" id="eco-level-title">Guardián Verde 🌿</div>
+            <p>Nivel 2 de 5 en la comunidad</p>
+          </div>
+        </div>
+
+        <div class="impact-card">
+          <div class="impact-icon-circle">💨</div>
+          <div class="impact-info">
+            <h4>CO₂ Reducido</h4>
+            <div class="impact-number" id="impact-co2-display">18.4 kg</div>
+            <p>Equivale a plantar 3 árboles urbanos</p>
+          </div>
+        </div>
+
+        <div class="impact-card">
+          <div class="impact-icon-circle">💧</div>
+          <div class="impact-info">
+            <h4>Agua Ahorrada</h4>
+            <div class="impact-number">3,200 L</div>
+            <p>Por reutilizar textiles y libros</p>
+          </div>
+        </div>
+
+        <div class="impact-card">
+          <div class="impact-icon-circle">🤝</div>
+          <div class="impact-info">
+            <h4>Vínculos Vecinales</h4>
+            <div class="impact-number">4 Familias</div>
+            <p>Conectadas a través de EcoSwap</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vista 4: Misiones Verdes -->
+    <section id="view-missions" class="tab-view" style="display: none;">
+      <div class="feed-header">
+        <h3 class="section-title">⚡ Desafíos Ecológicos Diarios</h3>
+      </div>
+      <div class="items-grid" id="missions-grid">
+        <!-- Renderizado dinámico de misiones con premios de puntos -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- MODAL 1: Publicar Nuevo Objeto -->
+  <div class="modal-overlay" id="modal-publish">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title"><span>🌱</span> Donar o Intercambiar un Objeto</h3>
+        <button class="btn-close" id="btn-close-publish">&times;</button>
+      </div>
+
+      <form id="form-publish">
+        <div class="form-group">
+          <label class="form-label" for="pub-title">Título del Artículo</label>
+          <input type="text" id="pub-title" class="form-input" placeholder="Ej: Lámpara de escritorio vintage" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="pub-category">Categoría</label>
+            <select id="pub-category" class="form-select" required>
+              <option value="Libros">📚 Libros</option>
+              <option value="Electrodomésticos">☕ Electrodomésticos</option>
+              <option value="Tecnología">🎧 Tecnología</option>
+              <option value="Plantas & Jardín">🪴 Plantas & Jardín</option>
+              <option value="Moda Sostenible">🧥 Moda Sostenible</option>
+              <option value="Hogar & Deco">🏠 Hogar & Deco</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="pub-points">Puntos Requeridos (Pts)</label>
+            <input type="number" id="pub-points" class="form-input" min="10" max="300" value="60" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Elige una Foto Ilustrativa o ingresa una URL</label>
+          <input type="url" id="pub-image" class="form-input" placeholder="https://images.unsplash.com/..." required>
+          
+          <div class="preset-images" id="preset-images-container">
+            <!-- Miniaturas predefinidas -->
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="pub-desc">Descripción o Estado</label>
+          <textarea id="pub-desc" class="form-textarea" rows="2" placeholder="Estado del producto, motivo por el que lo donas..."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+          <button type="button" class="chip-btn" id="btn-cancel-publish">Cancelar</button>
+          <button type="submit" class="btn-primary">
+            <span>✨</span> Publicar y ganar +30 Pts
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Billetera y Bono Diario -->
+  <div class="modal-overlay" id="modal-wallet">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title"><span>⭐</span> Tu Billetera EcoPoints</h3>
+        <button class="btn-close" id="btn-close-wallet">&times;</button>
+      </div>
+
+      <div style="background: var(--color-primary-subtle); padding: 1.25rem; border-radius: var(--radius-md); text-align: center; margin-bottom: 1.25rem; border: 1.5px solid var(--border-subtle);">
+        <p style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Saldo Disponible</p>
+        <div style="font-size: 2.3rem; font-weight: 800; color: var(--color-primary-dark); margin: 0.2rem 0;" id="wallet-balance-big">
+          250 Pts
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">
+          Ganas puntos donando artículos, completando misiones y reciclando.
+        </p>
+      </div>
+
+      <div class="wallet-streak-card">
+        <div class="wallet-streak-card-top">
+          <div class="wallet-streak-card-left">
+            <span class="wallet-streak-flame">🔥</span>
+            <div>
+              <div class="wallet-streak-title">Racha Diaria: <span id="wallet-streak-count" style="color: var(--color-fire, #f97316); font-weight:800;">0 Días</span></div>
+              <div class="wallet-streak-sub" id="wallet-streak-sub">Bono de hoy: +10 EcoPts fijos</div>
+            </div>
+          </div>
+          <button class="chip-btn" id="btn-wallet-open-streak-details" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+            Ver Calendario 📅
+          </button>
+        </div>
+        <button class="btn-primary" id="btn-daily-bonus" style="width: 100%; justify-content: center; padding: 0.85rem; margin-top: 0.75rem;">
+          <span>🔥</span> <span id="wallet-bonus-btn-label">Reclamar Login Diario (+10 EcoPts)</span>
+        </button>
+      </div>
+
+      <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.6rem; color: var(--text-main);">
+        📜 Historial de Actividad
+      </h4>
+      <div id="wallet-history-list" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem;">
+        <!-- Se llena con transacciones -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Detalle del Artículo -->
+  <div class="modal-overlay" id="modal-detail">
+    <div class="modal-box" id="detail-modal-content">
+      <!-- Se inyecta dinámicamente -->
+    </div>
+  </div>
+
+  <!-- MODAL 4: Racha Diaria de Conexión & Calendario -->
+  <div class="modal-overlay" id="modal-streak">
+    <div class="modal-box streak-modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title"><span>🔥</span> Racha de Conexión Diaria</h3>
+        <button class="btn-close" id="btn-close-streak">&times;</button>
+      </div>
+
+      <div class="streak-hero-display">
+        <div class="streak-flame-bubble" id="modal-flame-bubble">🔥</div>
+        <div class="streak-huge-number" id="modal-streak-count">0</div>
+        <div class="streak-huge-label">Días en Racha Consecutiva</div>
+        <div class="streak-rank-tag" id="modal-streak-rank">Semilla Constante 🌱</div>
+        <p class="streak-hero-desc" id="modal-streak-desc">
+          Entra a diario en la aplicación para mantener tu racha activa y sumar <strong>10 EcoPts diarios</strong> (bono fijo) para canjear productos sustentables.
+        </p>
+      </div>
+
+      <!-- Métricas rápidas de racha -->
+      <div class="streak-stats-row">
+        <div class="streak-stat-box">
+          <div class="stat-box-lbl">Récord Personal</div>
+          <div class="stat-box-val" id="modal-best-streak">0 Días</div>
+        </div>
+        <div class="streak-stat-box">
+          <div class="stat-box-lbl">Login Diario Fijo</div>
+          <div class="stat-box-val" style="color: var(--color-primary-dark);">+10 EcoPts</div>
+        </div>
+        <div class="streak-stat-box">
+          <div class="stat-box-lbl">Total Ganado en Racha</div>
+          <div class="stat-box-val" id="modal-total-streak-pts">0 Pts</div>
+        </div>
+      </div>
+
+      <!-- Calendario visual de 7 días -->
+      <div class="streak-track-section">
+        <div class="streak-track-header">
+          <span style="font-weight: 700; font-size: 0.95rem;">📅 Tu Ciclo Semanal</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">+10 EcoPts cada día</span>
+        </div>
+        <div class="streak-days-track" id="modal-days-track">
+          <!-- Renderizado dinámico vía App.js -->
+        </div>
+      </div>
+
+      <!-- Botón de Acción Principal en Modal -->
+      <div style="margin-top: 1.25rem;">
+        <button class="btn-primary" id="btn-modal-claim" style="width: 100%; justify-content: center; padding: 0.95rem; font-size: 1rem;">
+          <span>🔥</span> <span id="btn-modal-claim-text">Reclamar Recompensa (+10 EcoPts)</span>
+        </button>
+        <div class="streak-modal-countdown" id="modal-countdown-box" style="display: none;">
+          ⏱️ Próximo reclamo disponible en: <strong id="modal-countdown-timer">00:00:00</strong>
+        </div>
+      </div>
+
+      <!-- Sugerencia de Consumo -->
+      <div class="streak-modal-incentive">
+        <div style="display: flex; gap: 0.6rem; align-items: flex-start;">
+          <span style="font-size: 1.3rem;">💡</span>
+          <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.45;">
+            <strong>¿Por qué conectarte a diario?</strong> Los EcoPts te permiten llevarte objetos reales del feed comunitario sin pagar dinero. ¡Canjea antes de que otros vecinos los soliciten!
+          </p>
+        </div>
+      </div>
+
+      <!-- Herramientas de Prueba y Simulación -->
+      <details class="streak-dev-details">
+        <summary class="streak-dev-summary">⚙️ Simulador para pruebas rápidas</summary>
+        <div class="streak-dev-body">
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+            Comprueba cómo evoluciona la racha día tras día o qué sucede si se saltea un día:
+          </p>
+          <div class="streak-dev-buttons">
+            <button type="button" class="chip-btn" id="btn-test-advance-day">⚡ Simular Mañana (+1 día)</button>
+            <button type="button" class="chip-btn" id="btn-test-break-streak">⏭️ Simular Salto (+2 días / Racha rota)</button>
+            <button type="button" class="chip-btn" id="btn-test-reset-streak">🔄 Reiniciar Racha</button>
+          </div>
+          <div id="test-offset-display" class="test-offset-indicator"></div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- Banner Flotante de Instalación PWA -->
+  <div class="pwa-install-banner" id="pwa-install-banner" style="display: none;">
+    <div class="pwa-banner-card">
+      <div class="pwa-banner-media">
+        <img src="icons/icon-192.png" alt="EcoSwap Icon" class="pwa-banner-logo" />
+      </div>
+      <div class="pwa-banner-info">
+        <h4 class="pwa-banner-title">Instalar EcoSwap</h4>
+        <p class="pwa-banner-desc">Úsala como una app nativa: carga instantánea, acceso directo y funciona sin conexión.</p>
+      </div>
+      <div class="pwa-banner-actions">
+        <button class="btn-primary btn-sm" id="btn-pwa-banner-install">
+          <span>📲</span> Instalar
+        </button>
+        <button class="btn-icon btn-sm" id="btn-pwa-banner-close" title="Descartar por ahora">
+          &times;
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notificaciones Toast Flotantes -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Lógica de la Aplicación -->
+  <script src="App.js"></script>
+</body>
+</html>
