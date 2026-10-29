@@ -1,11 +1,11 @@
 /**
  * EcoSwap 🌱 Service Worker
- * Version: 1.0.0
+ * Version: 2.0.0
  * Provides robust offline functionality, caching strategies, and fast loading.
  */
 
-const CACHE_NAME = 'ecoswap-core-v1';
-const IMAGE_CACHE_NAME = 'ecoswap-images-v1';
+const CACHE_NAME = 'ecoswap-core-v2';
+const IMAGE_CACHE_NAME = 'ecoswap-images-v2';
 
 const STATIC_ASSETS = [
   './',

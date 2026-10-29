@@ -1,18 +1,18 @@
 {
-  "id": "/?source=pwa",
-  "name": "EcoSwap 🌱 | Plataforma Comunitaria de Intercambio",
+  "id": "ecoswap-pwa",
+  "name": "EcoSwap 🌱 | Plataforma Comunitaria de Intercambio Sustentable",
   "short_name": "EcoSwap",
   "description": "Plataforma comunitaria de economía circular: dale una segunda vida a tus objetos, gana EcoPuntos y mantén tu racha diaria.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui", "browser"],
   "orientation": "any",
   "background_color": "#09130e",
   "theme_color": "#10b981",
   "lang": "es",
   "dir": "ltr",
-  "categories": ["lifestyle", "shopping", "utilities", "social"],
+  "categories": ["lifestyle", "shopping", "utilities", "social", "productivity"],
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -43,6 +43,12 @@
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
+    },
+    {
+      "src": "icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "shortcuts": [
@@ -67,5 +73,6 @@
       "url": "./index.html?action=wallet",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     }
-  ]
+  ],
+  "prefer_related_applications": false
 }

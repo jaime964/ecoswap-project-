@@ -8,15 +8,21 @@
   
   <!-- PWA Meta Tags & Web App Manifest -->
   <link rel="manifest" href="manifest.webmanifest">
+  <link rel="alternate" type="application/manifest+json" href="manifest.json">
   <meta name="theme-color" content="#10b981" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#09130e" media="(prefers-color-scheme: dark)">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="EcoSwap">
+  <meta name="application-name" content="EcoSwap">
+  <meta name="msapplication-TileColor" content="#10b981">
+  <meta name="msapplication-TileImage" content="icons/icon-192.png">
   <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <link rel="mask-icon" href="icons/icon-maskable.svg" color="#10b981">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,6 +57,25 @@
           <span id="header-points-val">250 Pts</span>
         </button>
 
+        <!-- Botón Club EcoSwap Premium (Fase 3: Monetización) -->
+        <button class="premium-header-btn" id="btn-open-premium" title="Club EcoSwap Premium: Envíos gratis y el doble de EcoPuntos">
+          <span class="premium-star-icon">👑</span>
+          <span class="premium-btn-text" id="header-premium-label">Club Premium</span>
+          <span class="premium-badge-tag" id="header-premium-tag">⭐</span>
+        </button>
+
+        <!-- Botón Carrito de Compras -->
+        <button class="cart-header-btn" id="btn-open-cart" title="Ver Carrito de Compras">
+          <span>🛒</span>
+          <span class="cart-counter-badge" id="header-cart-count">2</span>
+        </button>
+
+        <!-- Botón Admin Panel Dashboard v2 -->
+        <button class="admin-header-btn" id="btn-open-admin" title="Panel de Administración Avanzado (Admin Dashboard v2)">
+          <span>🛡️</span>
+          <span class="admin-header-text">Admin</span>
+        </button>
+
         <!-- Botón Publicar Objeto -->
         <button class="btn-primary" id="btn-open-publish">
           <span>➕</span>
@@ -62,10 +87,11 @@
           🌙
         </button>
 
-        <!-- Botón Instalar PWA (visible si la app es instalable) -->
-        <button class="pwa-install-badge" id="btn-header-install" title="Instalar EcoSwap en tu dispositivo" style="display: none;">
-          <span class="pwa-icon">📲</span>
-          <span class="pwa-btn-text">Instalar App</span>
+        <!-- Botón Descargar PWA en Encabezado (Esquina superior derecha) -->
+        <button class="pwa-header-btn" id="btn-header-install" title="Descargar e instalar EcoSwap en tu dispositivo" aria-label="Descargar aplicación">
+          <span class="pwa-header-icon">📲</span>
+          <span class="pwa-header-text">Descargar App</span>
+          <span class="pwa-header-tag">PWA</span>
         </button>
       </div>
     </div>
@@ -171,6 +197,11 @@
 
     <!-- Vista 1: Feed de Artículos Disponibles -->
     <main id="view-feed" class="tab-view active">
+      <!-- Motor de Publicidad Interno: Banner Patrocinado Dinámico Rotativo -->
+      <section id="sponsored-banner-section" class="sponsored-banner-slot" aria-label="Publicidad Sustentable Patrocinada">
+        <!-- Generado dinámicamente vía app.js -->
+      </section>
+
       <!-- Barra de Filtros y Búsqueda -->
       <section class="controls-bar">
         <div class="search-box">
@@ -468,6 +499,22 @@
     </div>
   </div>
 
+  <!-- Botón Flotante de Descarga PWA (Esquina inferior derecha) -->
+  <aside class="pwa-corner-widget" id="pwa-corner-widget" aria-label="Descargar aplicación">
+    <button class="pwa-corner-fab" id="btn-corner-install" title="Descargar e instalar EcoSwap en tu dispositivo" aria-label="Descargar aplicación">
+      <span class="pwa-corner-pulse"></span>
+      <span class="pwa-corner-glow"></span>
+      <div class="pwa-corner-content">
+        <span class="pwa-corner-icon">📲</span>
+        <div class="pwa-corner-text-wrap">
+          <span class="pwa-corner-action">Descargar App</span>
+          <span class="pwa-corner-sub">Instalar PWA</span>
+        </div>
+        <span class="pwa-corner-badge">PWA</span>
+      </div>
+    </button>
+  </aside>
+
   <!-- Banner Flotante de Instalación PWA -->
   <div class="pwa-install-banner" id="pwa-install-banner" style="display: none;">
     <div class="pwa-banner-card">
@@ -485,6 +532,368 @@
         <button class="btn-icon btn-sm" id="btn-pwa-banner-close" title="Descartar por ahora">
           &times;
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Descarga e Instalación PWA (Compatible con Android, iPhone, Windows y Mac) -->
+  <div class="modal-overlay" id="modal-pwa-install" role="dialog" aria-modal="true" aria-labelledby="pwa-modal-heading">
+    <div class="modal-box pwa-install-modal-box">
+      <div class="modal-header">
+        <div class="pwa-modal-header-brand">
+          <div class="pwa-modal-icon-wrap">
+            <img src="icons/icon-192.png" alt="EcoSwap Logo" class="pwa-modal-app-icon" />
+            <span class="pwa-modal-tag-badge">PWA</span>
+          </div>
+          <div>
+            <h3 class="modal-title" id="pwa-modal-heading">Descargar EcoSwap 🌱</h3>
+            <p class="pwa-modal-subtitle">Aplicación Web Progresiva • Gratuita y Segura</p>
+          </div>
+        </div>
+        <button class="btn-close" id="btn-close-pwa-modal" aria-label="Cerrar modal">&times;</button>
+      </div>
+
+      <div class="pwa-modal-body">
+        <!-- Banner de Acción Principal Directa -->
+        <div class="pwa-direct-install-card">
+          <div class="pwa-direct-install-text">
+            <div class="pwa-direct-status-row">
+              <span class="pwa-status-dot"></span>
+              <span class="pwa-status-label" id="pwa-status-text">Lista para instalar en tu dispositivo</span>
+            </div>
+            <p class="pwa-direct-desc">
+              Instala EcoSwap para disfrutar de una experiencia fluida a pantalla completa, inicio rápido y soporte 100% sin conexión a internet.
+            </p>
+          </div>
+          <button class="btn-primary pwa-btn-cta" id="btn-pwa-direct-install">
+            <span>📲</span> <span id="pwa-direct-cta-label">Instalar Ahora</span>
+          </button>
+        </div>
+
+        <!-- Ventajas Clave de la PWA -->
+        <div class="pwa-perks-grid">
+          <div class="pwa-perk-item">
+            <div class="pwa-perk-icon">⚡</div>
+            <div>
+              <div class="pwa-perk-title">Carga Instantánea</div>
+              <div class="pwa-perk-desc">Sin barras del navegador. Abre como app nativa.</div>
+            </div>
+          </div>
+          <div class="pwa-perk-item">
+            <div class="pwa-perk-icon">📴</div>
+            <div>
+              <div class="pwa-perk-title">Modo 100% Offline</div>
+              <div class="pwa-perk-desc">Consulta tus puntos y artículos sin internet.</div>
+            </div>
+          </div>
+          <div class="pwa-perk-item">
+            <div class="pwa-perk-icon">💾</div>
+            <div>
+              <div class="pwa-perk-title">Ultraligera (&lt; 2 MB)</div>
+              <div class="pwa-perk-desc">Cero consumo de memoria. Sin tiendas externas.</div>
+            </div>
+          </div>
+          <div class="pwa-perk-item">
+            <div class="pwa-perk-icon">🔥</div>
+            <div>
+              <div class="pwa-perk-title">Racha al Instante</div>
+              <div class="pwa-perk-desc">Acceso en 1 toque para asegurar tus +10 EcoPts.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instrucciones Detalladas por Sistema Operativo -->
+        <div class="pwa-guide-box">
+          <div class="pwa-guide-header">
+            <span class="pwa-guide-title">📖 ¿Cómo descargar según tu navegador o equipo?</span>
+          </div>
+
+          <!-- Selector de plataforma interactivo -->
+          <div class="pwa-platform-tabs" role="tablist">
+            <button class="pwa-platform-tab active" data-platform="android" id="tab-pwa-android" role="tab" aria-selected="true">
+              <span>🤖</span> Android
+            </button>
+            <button class="pwa-platform-tab" data-platform="ios" id="tab-pwa-ios" role="tab" aria-selected="false">
+              <span>🍎</span> iPhone / iPad
+            </button>
+            <button class="pwa-platform-tab" data-platform="desktop" id="tab-pwa-desktop" role="tab" aria-selected="false">
+              <span>💻</span> PC / Mac
+            </button>
+          </div>
+
+          <!-- Paneles de instrucciones -->
+          <div class="pwa-instructions-content">
+            <!-- Android -->
+            <div class="pwa-step-panel active" id="panel-pwa-android">
+              <div class="pwa-step-row">
+                <span class="pwa-step-badge">1</span>
+                <p>Toca el botón de opciones (<strong>⋮</strong>) en la esquina superior derecha del navegador Chrome o Edge.</p>
+              </div>
+              <div class="pwa-step-row">
+                <span class="pwa-step-badge">2</span>
+                <p>Selecciona <strong>"Instalar aplicación"</strong> o <strong>"Agregar a la pantalla principal"</strong>.</p>
+              </div>
+              <div class="pwa-step-row">
+                <span class="pwa-step-badge">3</span>
+                <p>Confirma tocando <strong>"Instalar"</strong>. ¡El ícono de EcoSwap quedará listo en tu menú de apps!</p>
+              </div>
+            </div>
+
+            <!-- iOS / iPhone / iPad -->
+            <div class="pwa-step-panel" id="panel-pwa-ios">
+              <div class="pwa-step-row">
+                <span class="pwa-step-badge">1</span>
+                <p>En Safari, pulsa el botón <strong>Compartir</strong> (<strong>⎋</strong> rectángulo con flecha hacia arriba en la barra inferior).</p>
+              </div>
+              <div class="pwa-step-row">
+                <span class="pwa-step-badge">2</span>
+                <p>Desliza las opciones y pulsa en <strong>"Agregar al inicio"</strong> (<strong>➕</strong>).</p>
+              </div>
+              <div class="pwa-step-row">
+                <span class="pwa-step-badge">3</span>
+                <p>Pulsa <strong>"Agregar"</strong> en la esquina superior derecha. ¡Quedará guardada como app en tu pantalla!</p>
+              </div>
+            </div>
+
+            <!-- Desktop (Windows / Mac) -->
+            <div class="pwa-step-panel" id="panel-pwa-desktop">
+              <div class="pwa-step-row">
+                <span class="pwa-step-badge">1</span>
+                <p>Haz clic en el ícono de instalación (<strong>💻</strong> o <strong>⬇️</strong>) a la derecha en la barra de direcciones.</p>
+              </div>
+              <div class="pwa-step-row">
+                <span class="pwa-step-badge">2</span>
+                <p>O pulsa en el menú (<strong>⋮</strong>) > <strong>Guardar y compartir</strong> > <strong>"Instalar EcoSwap"</strong>.</p>
+              </div>
+              <div class="pwa-step-row">
+                <span class="pwa-step-badge">3</span>
+                <p>¡Se abrirá en su propia ventana sin barras molestas y con acceso directo en tu escritorio!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acciones Secundarias: Compartir enlace y Comprobar estado -->
+        <div class="pwa-modal-footer-actions">
+          <button class="chip-btn" id="btn-pwa-share-app" type="button">
+            <span>🔗</span> Compartir / Copiar Enlace
+          </button>
+          <button class="chip-btn" id="btn-pwa-simulate-mode" type="button" title="Ver cómo se comporta la PWA instalada">
+            <span>📱</span> Probar Vista Standalone
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: EcoSwap Premium (Fase 3: Monetización & Membresía)              -->
+  <!-- ===================================================================== -->
+  <div class="modal-overlay" id="modal-premium" role="dialog" aria-modal="true" aria-labelledby="premium-modal-heading">
+    <div class="modal-box premium-modal-box">
+      <div class="modal-header premium-header-accent">
+        <div class="premium-header-title-wrap">
+          <div class="premium-icon-circle">⭐</div>
+          <div>
+            <div class="premium-tag-pill">Club Verde de EcoSwap</div>
+            <h3 class="modal-title" id="premium-modal-heading">Únete al club verde, envíos gratis y el doble de EcoPuntos</h3>
+          </div>
+        </div>
+        <button class="btn-close" id="btn-close-premium-modal" aria-label="Cerrar modal">&times;</button>
+      </div>
+
+      <div class="modal-body premium-modal-body">
+        <!-- Beneficios Clave -->
+        <div class="premium-perks-container">
+          <div class="premium-perk-card">
+            <div class="premium-perk-badge">🚚</div>
+            <div class="premium-perk-info">
+              <h4>Envíos 100% Gratuitos ($0)</h4>
+              <p>Cero costos de flete en todos tus canjes y compras sin mínimo de consumo.</p>
+            </div>
+          </div>
+
+          <div class="premium-perk-card">
+            <div class="premium-perk-badge">⭐</div>
+            <div class="premium-perk-info">
+              <h4>El DOBLE (x2) de EcoPuntos</h4>
+              <p>Multiplica tus puntos en cada transacción para canjear más rápido objetos vecinales.</p>
+            </div>
+          </div>
+
+          <div class="premium-perk-card">
+            <div class="premium-perk-badge">👑</div>
+            <div class="premium-perk-info">
+              <h4>Catálogo Exclusivo VIP</h4>
+              <p>Acceso prioritario a bicicletas recicladas, tecnología reacondicionada y kits solares.</p>
+            </div>
+          </div>
+
+          <div class="premium-perk-card">
+            <div class="premium-perk-badge">🎁</div>
+            <div class="premium-perk-info">
+              <h4>Bono de +200 EcoPuntos</h4>
+              <p>Acreditación inmediata en tu billetera verde al momento de suscribirte.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selector de Planes -->
+        <div class="premium-pricing-box">
+          <div class="plan-cycle-toggle">
+            <button class="plan-toggle-btn active" id="btn-plan-annual" data-cycle="annual">
+              Anual ($39.99/año) • <span class="discount-tag">Ahorra 35%</span>
+            </button>
+            <button class="plan-toggle-btn" id="btn-plan-monthly" data-cycle="monthly">
+              Mensual ($4.99/mes)
+            </button>
+          </div>
+
+          <div class="plan-summary-price">
+            <div class="price-val" id="premium-price-display">$39.99 <span class="price-sub">/ año ($3.33/mes)</span></div>
+            <div class="price-desc" id="premium-price-desc">Facturado anualmente. Cancela en cualquier momento sin penalidad.</div>
+          </div>
+
+          <!-- Botones de Pasarelas Simuladas (Mercado Pago o Stripe) -->
+          <div class="checkout-actions-row">
+            <button class="btn-gateway-mercadopago" id="btn-pay-mercadopago">
+              <span>💳</span> Pagar con Mercado Pago
+            </button>
+            <button class="btn-gateway-stripe" id="btn-pay-stripe">
+              <span>⭐</span> Pagar con Stripe
+            </button>
+          </div>
+          <p class="checkout-disclaimer">
+            🔒 Pasarela simulada para evaluación de arquitectura. Actualiza automáticamente tu cuenta a <strong>PREMIUM</strong> y despacha correo transaccional.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: Carrito de Compras (Lógica de Envíos $0 y EcoPuntos x2)        -->
+  <!-- ===================================================================== -->
+  <div class="modal-overlay" id="modal-cart" role="dialog" aria-modal="true" aria-labelledby="cart-modal-heading">
+    <div class="modal-box cart-modal-box">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.5rem;">🛒</span>
+          <div>
+            <h3 class="modal-title" id="cart-modal-heading">Carrito de Compras Sustentable</h3>
+            <span style="font-size:0.75rem; color:var(--text-muted);" id="cart-tier-indicator">Nivel de Usuario: FREE</span>
+          </div>
+        </div>
+        <button class="btn-close" id="btn-close-cart-modal" aria-label="Cerrar modal">&times;</button>
+      </div>
+
+      <div class="modal-body cart-modal-body">
+        <!-- Banner de Ventajas Premium en Carrito -->
+        <div id="cart-premium-banner" class="cart-premium-alert">
+          <!-- Renderizado dinámico vía app.js según FREE o PREMIUM -->
+        </div>
+
+        <!-- Lista de Items en Carrito -->
+        <div class="cart-items-list" id="cart-items-container">
+          <!-- Renderizado dinámico -->
+        </div>
+
+        <!-- Resumen de Costos y Multiplicador -->
+        <div class="cart-summary-section">
+          <div class="cart-summary-row">
+            <span>Subtotal:</span>
+            <span id="cart-subtotal-val">$36.50</span>
+          </div>
+          <div class="cart-summary-row">
+            <span>Costo de Envío:</span>
+            <span id="cart-shipping-val">$5.00</span>
+          </div>
+          <div class="cart-summary-row total-row">
+            <span>Total a Pagar:</span>
+            <span id="cart-total-val">$41.50</span>
+          </div>
+          
+          <div class="cart-points-reward" id="cart-points-reward-box">
+            <span>⭐ EcoPuntos a recibir:</span>
+            <strong id="cart-points-val">+36 Pts</strong>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="btn-cart-checkout" style="width: 100%; justify-content: center; font-size: 1rem; padding: 0.85rem;">
+          <span>✅</span> Finalizar Pedido y Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: Admin Dashboard v2 (Sidebar Layout, Métricas, Ads & Inventario) -->
+  <!-- ===================================================================== -->
+  <div class="modal-overlay" id="modal-admin" role="dialog" aria-modal="true" aria-labelledby="admin-modal-heading">
+    <div class="modal-box admin-modal-box">
+      <div class="modal-header admin-modal-header">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <div class="admin-shield-icon">🛡️</div>
+          <div>
+            <h3 class="modal-title" id="admin-modal-heading">EcoSwap Admin Dashboard v2</h3>
+            <span class="admin-role-badge" id="admin-current-role-badge">SuperAdmin Verificado • middleware.ts activo</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <button class="chip-btn" id="btn-toggle-admin-role-sim" title="Alternar entre USER y ADMIN para probar protección middleware">
+            Simular Rol: <strong id="sim-role-text">ADMIN</strong>
+          </button>
+          <button class="btn-close" id="btn-close-admin-modal" aria-label="Cerrar modal">&times;</button>
+        </div>
+      </div>
+
+      <div class="admin-layout-container">
+        <!-- Sidebar de Pestañas -->
+        <aside class="admin-sidebar">
+          <button class="admin-nav-item active" data-admintab="overview">
+            <span>📊</span> Dashboard General
+          </button>
+          <button class="admin-nav-item" data-admintab="users">
+            <span>👥</span> Gestor de Usuarios
+          </button>
+          <button class="admin-nav-item" data-admintab="ads">
+            <span>📢</span> Gestor de Publicidad
+          </button>
+          <button class="admin-nav-item" data-admintab="inventory">
+            <span>📦</span> Gestor de Inventario
+            <span class="pulse-dot-red"></span>
+          </button>
+          <button class="admin-nav-item" data-admintab="emails">
+            <span>📧</span> Plantillas de Correo
+          </button>
+        </aside>
+
+        <!-- Contenido Dinámico de la Pestaña Activa -->
+        <div class="admin-main-panel" id="admin-main-content">
+          <!-- Renderizado dinámicamente en App.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: Vista Previa de Plantillas de Correo Transaccional (HTML)      -->
+  <!-- ===================================================================== -->
+  <div class="modal-overlay" id="modal-email-preview" role="dialog" aria-modal="true" aria-labelledby="email-modal-heading">
+    <div class="modal-box" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="email-modal-heading">📧 Vista Previa de Correo Transaccional</h3>
+        <button class="btn-close" id="btn-close-email-modal" aria-label="Cerrar modal">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 1rem;">
+        <div style="display:flex; gap:0.5rem; margin-bottom:1rem;" id="email-tabs-container">
+          <button class="chip-btn active" id="btn-email-tab-premium">Bienvenido Premium</button>
+          <button class="chip-btn" id="btn-email-tab-order">Orden Confirmada</button>
+          <button class="chip-btn" id="btn-email-tab-stock">Alerta Stock Bajo</button>
+        </div>
+        <div id="email-preview-frame" style="border:1px solid var(--border-light); border-radius:12px; overflow:hidden; min-height:420px; background:#fff;">
+          <!-- HTML del correo inyectado aquí -->
+        </div>
       </div>
     </div>
   </div>

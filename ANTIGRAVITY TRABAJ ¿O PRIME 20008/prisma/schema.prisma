@@ -1,0 +1,169 @@
+// =============================================================================
+// EcoSwap 🌱 - Prisma Schema (Fase 3: Monetización, Ads & Admin Avanzado)
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -----------------------------------------------------------------------------
+// Enums
+// -----------------------------------------------------------------------------
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+}
+
+enum AdCampaignStatus {
+  ACTIVE
+  PAUSED
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+// -----------------------------------------------------------------------------
+// Modelos Principales
+// -----------------------------------------------------------------------------
+
+model User {
+  id                    String            @id @default(cuid())
+  email                 String            @unique
+  name                  String
+  role                  Role              @default(USER)
+  status                UserStatus        @default(ACTIVE)
+  
+  // Membresía y Monetización
+  subscriptionTier      SubscriptionTier  @default(FREE)
+  stripeCustomerId      String?
+  mercadoPagoId         String?
+  subscriptionExpiresAt DateTime?
+  
+  // Gamificación sustentable
+  ecoPoints             Int               @default(250)
+  streakDays            Int               @default(0)
+  
+  // Auditoría
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  // Relaciones
+  products              Product[]
+  orders                Order[]
+  createdCampaigns      AdCampaign[]
+
+  @@index([email])
+  @@index([subscriptionTier])
+  @@index([role])
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  title       String
+  description String
+  category    String
+  points      Int         // Costo en EcoPuntos
+  price       Float       @default(0.0) // Precio monetario (monetización e-commerce)
+  stock       Int         @default(1)
+  condition   String      @default("Excelente estado")
+  imageUrl    String
+  distance    String?     @default("Cerca de ti")
+  co2Savings  Float       @default(2.5) // kg de CO2 evitados
+  
+  // Patrocinio y Exclusividad
+  isSponsored Boolean     @default(false)
+  isExclusive Boolean     @default(false) // Acceso exclusivo para usuarios PREMIUM
+  
+  // Vendedor o Donante
+  userId      String?
+  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Auditoría
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relaciones
+  orderItems  OrderItem[]
+
+  @@index([category])
+  @@index([isSponsored])
+  @@index([isExclusive])
+}
+
+model AdCampaign {
+  id          String            @id @default(cuid())
+  title       String
+  imageUrl    String
+  targetUrl   String
+  budget      Float             @default(0.0)
+  status      AdCampaignStatus  @default(ACTIVE)
+  clicks      Int               @default(0)
+  impressions Int               @default(0)
+
+  // Creador / Anunciante
+  createdById String?
+  createdBy   User?             @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  // Auditoría
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([status])
+}
+
+model Order {
+  id                      String      @id @default(cuid())
+  userId                  String
+  user                    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Detalles financieros
+  subtotal                Float
+  shippingCost            Float       @default(0.0) // $0 para miembros PREMIUM
+  totalAmount             Float
+  ecoPointsAwarded        Int         @default(0)   // Multiplicado x2 para PREMIUM
+  isPremiumBenefitApplied Boolean     @default(false)
+  status                  OrderStatus @default(COMPLETED)
+
+  // Auditoría
+  createdAt               DateTime    @default(now())
+  updatedAt               DateTime    @updatedAt
+
+  // Relaciones
+  items                   OrderItem[]
+
+  @@index([userId])
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int      @default(1)
+  unitPrice Float
+
+  @@index([orderId])
+  @@index([productId])
+}
+
